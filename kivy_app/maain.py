@@ -1,10 +1,10 @@
 import os, sys
 import kivy  # importing main package
 import socket_client
-from kivy.app import App  # required base class for your app.
+from kivy.app import App  # required base class for app.
 from kivy.uix.label import Label  # uix element that will hold text
-from kivy.uix.gridlayout import GridLayout  # one of many layout structures
-from kivy.uix.textinput import TextInput  # allow for ...text input.
+from kivy.uix.gridlayout import GridLayout  # layout structures
+from kivy.uix.textinput import TextInput  # text input.
 from kivy.uix.button import Button # to add a button
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.clock import Clock
@@ -12,14 +12,12 @@ from kivy.core.window import Window
 from kivy.uix.scrollview import ScrollView
 
 
-kivy.require("1.10.1")  # make sure people running py file have right version
+kivy.require("1.10.1")  # version of kivy
 
-# An actual app is likely to consist of many different
-# "pages" or "screens." Inherit from GridLayout
 class ConnectPage(GridLayout):
-    # runs on initialization
+    # initialization
     def __init__(self, **kwargs):
-        # we want to run __init__ of both ConnectPage AAAAND GridLayout
+        # we want to run __init__ of both ConnectPage and GridLayout
         super().__init__(**kwargs)
 
         self.cols = 2  # used for our grid
@@ -36,7 +34,7 @@ class ConnectPage(GridLayout):
             prev_port = ''
             prev_username = ''
 
-        # widgets added in order, so mind the order.
+        # widgets------------------------------------------------------------------
         '''
         IP address
         '''
@@ -72,17 +70,13 @@ class ConnectPage(GridLayout):
         username = self.username.text
         with open("prev_details.txt","w") as f:
             f.write(f"{ip},{port},{username}")
-        # Joining 127.0.0.1:1234 as Ruthwik
-        # print(f"Joining {ip}:{port} as {username}")
-        # Create info string, update InfoPage with a message and show it
+        # Joining 127.0.0.1:1234 as username
         info = f"Joining {ip}:{port} as {username}"
         chat_app.info_page.update_info(info)
         chat_app.screen_manager.current = 'Info'
         Clock.schedule_once(self.connect, 1) #scheduling the actual connection one second after user clicks join.
 
     # Connects to the server
-    # (second parameter is the time after which this function had been called,
-    #  we don't care about it, but kivy sends it, so we have to receive it)
     def connect(self, _):
 
         # Get information for sockets client
@@ -108,13 +102,7 @@ class InfoPage(GridLayout):
 
         # And one label with bigger font and centered text
         self.message = Label(halign="center", valign="middle", font_size=30)
-
-        # By default every widget returns it's side as [100, 100], it gets finally resized,
-        # but we have to listen for size change to get a new one
-        # more: https://github.com/kivy/kivy/issues/1044
         self.message.bind(width=self.update_text_width)
-
-        # Add text widget to the layout
         self.add_widget(self.message)
 
     # Called with a message, to update message text in widget
@@ -129,8 +117,7 @@ class InfoPage(GridLayout):
 class ChatPage(GridLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-        # We are going to use 1 column and 2 rows
+        
         self.cols = 1
         self.rows = 2
 
@@ -228,9 +215,6 @@ class ChatPage(GridLayout):
         self.history.update_chat_history(f'[color=20dd20]{username}[/color] > {message}')
 
 
-
-# Our simple app. NameApp  convention matters here. Kivy
-# uses some magic here, so make sure you leave the App bit in there!
 class EpicApp(App):
     # This is your "initialize" for the root widget
     def build(self):
@@ -270,7 +254,7 @@ class ScrollableLabel(ScrollView):
         # ScrollView does not allow us to add more than one widget, so we need to trick it
         # by creating a layout and placing two widgets inside it
         # Layout is going to have one collumn and and size_hint_y set to None,
-        # so height wo't default to any size (we are going to set it on our own)
+        # so height will not default to any size (we are going to set it on our own)
         self.layout = GridLayout(cols=1, size_hint_y=None)
         self.add_widget(self.layout)
 
